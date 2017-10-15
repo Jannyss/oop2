@@ -17,9 +17,6 @@ public:
     // Добавляет число в набор.
     void AddNum( const T &num ) {
         statmset.insert(num);
-//        if (num > maxvalue) maxvalue = num;
-//        if (num < minvalue) minvalue = num;
-//        avgvalue = accumulate(statmset.begin(), statmset.end(), 0)/statmset.size();
         changed = 1;
         changedunder = 1;
         changedabove = 1;
@@ -60,56 +57,87 @@ public:
         }
     }
 
-    int GetMax() const {
-        if (changed == 0) return maxvalue;
-        else {
-            for (auto i : statmset) {
-                if (i > maxvalue) maxvalue = i;
+    T GetMax() const {
+        if (!CheckEmptyMultiset()) {
+            if (changed == 0) return maxvalue;
+            else {
+                for (auto i : statmset) {
+                    if (i > maxvalue) maxvalue = i;
+                }
+                return maxvalue;
             }
-            return maxvalue;
         }
+        else {
+            cout << "Error. Multiset is empty.";
+            return -1;
+        ;}
     }
 
-    int GetMin() const {
-        if (changed == 0) return minvalue;
-        else {
-            for (auto i : statmset) {
-                if (i < maxvalue) minvalue = i;
+    T GetMin() const {
+        if (!CheckEmptyMultiset()) {
+            if (changed == 0) return minvalue;
+            else {
+                for (auto i : statmset) {
+                    if (i < maxvalue) minvalue = i;
+                }
+                changed = 0;
+                return minvalue;
             }
-            changed = 0;
-            return minvalue;
         }
+        else {
+            cout << "Error. Multiset is empty.";
+            return -1;
+        }
+
     }
 
     float GetAvg() const {
-        if (changed == 0) return avgvalue;
+        if (!CheckEmptyMultiset()) {
+            if (changed == 0) return avgvalue;
+            else {
+                avgvalue = (float)accumulate(statmset.begin(), statmset.end(), 0)/statmset.size();
+                changed = 0;
+                return avgvalue;
+            }
+        }
         else {
-            avgvalue = (float)accumulate(statmset.begin(), statmset.end(), 0)/statmset.size();
-            changed = 0;
-            return avgvalue;
+            cout << "Error. Multiset is empty.";
+            return -1;
         }
     }
 
     int GetCountUnder(float threshold) const {
-        if ((countunder.second == threshold) && (changedunder == 0)) return countunder.first;
+        if (!CheckEmptyMultiset()) {
+            if ((countunder.second == threshold) && (changedunder == 0)) return countunder.first;
+            else {
+                typename multiset<T>::iterator itlow = statmset.lower_bound(threshold);
+                int countel = 0;
+                for (typename multiset<T>::iterator it = statmset.begin(); it != itlow; ++it) countel++;
+                changedunder = 0;
+                countunder = make_pair(countel, threshold);
+                return countel;
+            }
+        }
         else {
-            typename multiset<T>::iterator itlow = statmset.lower_bound(threshold);
-            int countel = 0;
-            for (typename multiset<T>::iterator it = statmset.begin(); it != itlow; ++it) countel++;
-            changedunder = 0;
-            countunder = make_pair(countel, threshold);
-            return countel;
+            cout << "Error. Multiset is empty.";
+            return -1;
         }
     }
 
     int GetCountAbove(float threshold) const {
-        if ((countabove.second == threshold) && (changedabove == 0)) return countabove.first;
+        if (!CheckEmptyMultiset()) {
+            if ((countabove.second == threshold) && (changedabove == 0)) return countabove.first;
+            else {
+                typename multiset<T>::iterator itup = statmset.upper_bound(threshold);
+                int countel = 0;
+                for (typename multiset<T>::iterator it = itup; it != statmset.end(); ++it) countel++;
+                changedabove = 0;
+                return countel;
+            }
+        }
         else {
-            typename multiset<T>::iterator itup = statmset.upper_bound(threshold);
-            int countel = 0;
-            for (typename multiset<T>::iterator it = itup; it != statmset.end(); ++it) countel++;
-            changedabove = 0;
-            return countel;
+            cout << "Error. Multiset is empty.";
+            return -1;
         }
     }
 
@@ -117,7 +145,11 @@ public:
         for (typename multiset<T>::iterator it = statmset.begin(); it != statmset.end(); ++it) {
             cout << *it << " ";
         }
-}
+    }
+
+    bool CheckEmptyMultiset() const {
+        return statmset.empty();
+    }
 
 private:
     multiset<T> statmset;
