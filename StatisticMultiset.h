@@ -14,15 +14,18 @@ template<class T>
 
 class StatisticMultiset {
 public:
-    // Добавляет число в набор.
+    // Г„Г®ГЎГ ГўГ«ГїГҐГІ Г·ГЁГ±Г«Г® Гў Г­Г ГЎГ®Г°.
     void AddNum( const T &num ) {
         statmset.insert(num);
         changed = 1;
         changedunder = 1;
         changedabove = 1;
+        changedmax = 1;
+        changedmin = 1;
+        changedavg = 1;
 
     };
-    // Данные из multiset-а
+    // Г„Г Г­Г­Г»ГҐ ГЁГ§ multiset-Г 
     void AddNum( const multiset<T>& numbers ) {
         for (typename multiset<T>::iterator it = numbers.begin(); it != numbers.end(); ++it) {
             StatisticMultiset::AddNum(*it);
@@ -59,11 +62,12 @@ public:
 
     T GetMax() const {
         if (!CheckEmptyMultiset()) {
-            if (changed == 0) return maxvalue;
+            if (changedmax == 0) return maxvalue;
             else {
                 for (auto i : statmset) {
                     if (i > maxvalue) maxvalue = i;
                 }
+                changedmax = 0;
                 return maxvalue;
             }
         }
@@ -75,12 +79,12 @@ public:
 
     T GetMin() const {
         if (!CheckEmptyMultiset()) {
-            if (changed == 0) return minvalue;
+            if (changedmin == 0) return minvalue;
             else {
                 for (auto i : statmset) {
                     if (i < maxvalue) minvalue = i;
                 }
-                changed = 0;
+                changedmin = 0;
                 return minvalue;
             }
         }
@@ -93,10 +97,10 @@ public:
 
     float GetAvg() const {
         if (!CheckEmptyMultiset()) {
-            if (changed == 0) return avgvalue;
+            if (changedavg == 0) return avgvalue;
             else {
                 avgvalue = (float)accumulate(statmset.begin(), statmset.end(), 0)/statmset.size();
-                changed = 0;
+                changedavg = 0;
                 return avgvalue;
             }
         }
